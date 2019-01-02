@@ -64,16 +64,13 @@ enableGitInfo = false
 
   # Details for the Contact Widget
   email = "bcapistrant@smith.edu"
-  address = "Lilly Hall, 23 West St, Northampton, MA 01063"
-  office_hours = """
-  Monday 14:00 to 17:00<br>
-  Tuesday 09:30 to 12:00<br>
-  Otherwise email to book an appointment
-  """
-  phone = ""
-  skype = ""
+  address = "Office: 310 Lilly Hall. Mailing: 23 West St, Northampton MA, 01063, USA"
+  # office_hours = "Monday 10:00 to 13:00 or email for appointment"
+  # skype = "rudeboybert"
+  phone = "+1-413-585-4634 (no voicemails please, emails preferred)"
   telegram = ""
-  keybase = ""  # Your keybase.io username.
+  twitter = "bencapistrant"
+  github = "bencapistrant"
 
   # Enter an optional link for booking appointments (e.g. calendly.com).
   appointment_url = ""
