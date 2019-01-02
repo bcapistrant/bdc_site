@@ -47,6 +47,13 @@ filter_default = 0
 # [[filter]]
 #   name = "Other"
 #   tag = "Demo"
-
+  
 +++
 
+[[filter]]
+  name = "Caregiving"
+  tag = "Caregiving"
+
+[[filter]]
+  name = "LGBT Aging"
+  tag = "LGBT Aging"
