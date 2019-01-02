@@ -48,6 +48,10 @@ filter_default = 1
 [[filter]]
   name = "LGBT Aging"
   tag = "LGBT Aging"
+
+[[filter]]
+  name = "brfssR"
+  tag = "brfss"
   
 +++
 
