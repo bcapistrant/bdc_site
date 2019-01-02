@@ -36,22 +36,22 @@ filter_default = 1
 # To show all items, set `tag` to "*".
 # To filter by a specific tag, set `tag` to an existing tag name.
 # To remove toolbar, delete/comment all instances of `[[filter]]` below.
-# [[filter]]
-#   name = "All"
-#   tag = "*"
-#
+
+[[filter]]
+   name = "All"
+   tag = "*"
 
 [[filter]]
   name = "Caregiving"
-  tag = "Caregiving"
+  tag = ".caregiving"
 
 [[filter]]
   name = "LGBT Aging"
-  tag = "LGBT Aging"
+  tag = ".LGBT-Aging"
 
 [[filter]]
   name = "brfssR"
-  tag = "brfss"
+  tag = ".brfssR"
   
 +++
 
