@@ -1,0 +1,58 @@
+---
+title: Teaching
+menu:
+  main:
+    parent: Teaching
+    weight: 2
+type: docs
+weight: 1
+---
+
+## 2019 - 2020 
+
+- Spring
+    + Multiple Regression (SDS 291)
+    
+- Summer
+    + Secondary Data Analysis (SOCW 798)
+    + Social Construction of Aging in the 21st Century (SOCW 704)
+    
+
+## 2018 - 2019 
+
+- Spring
+    + Multiple Regression (SDS 291)
+    
+- Summer
+    + Social Work Research Methods - Intermediate (SOCW 642/643)
+    + Social Work Research Methods I / II (SOCW 820/821)
+
+
+## 2017 - 2018 
+### [Smith College, Statistical & Data Sciences](https://www.smith.edu/sds/courses_F17S18.php)
+
+- Fall
+    + Multiple Regression (SDS 291)
+    + Introduction to Probability and Statistics - Lab Instructor (SDS 220) 
+    
+- Spring
+    + [Population Health - Data and Analysis](https://www.science.smith.edu/~bcapistrant/sds390) (SDS 390)
+    + Multiple Regression ([SDS 291](SDS291_Syllabus_Spring2018_v02.pdf))
+    + Statistical Methods for Undergraduates - Lab Instructor (SDS 201)
+
+## 2016-2017 
+### [University of Minnesota, School of Public Health](http://www.sph.umn.edu/academics/syllabi/)
+
+- Spring
+    + Completing the Culminating Experience: Secondary Data Analysis ([PUBH 6344](http://www.sph.umn.edu/site/docs/syllabi/Syllabi/2017/Spring/PubH-6344.pdf))
+    + Evaluation ([PUBH 6034](http://www.sph.umn.edu/site/docs/syllabi/Syllabi/2017/Spring/PubH-6034.pdf))
+    + Qualitative Research Methods in Public Health Practice ([PUBH 6636](http://www.sph.umn.edu/site/docs/syllabi/Syllabi/2017/Spring/PubH-6636.pdf))
+
+## 2015-2016 
+### [University of Minnesota, School of Public Health](http://www.sph.umn.edu/academics/syllabi/)
+
+- Spring
+    + Population Aging and Health ([PUBH 6390](http://www.sph.umn.edu/site/docs/syllabi/Syllabi/2016/Spring/PubH-6390.pdf))
+- May Term/Public Health Institute
+    + A Growing Global Health Crisis: Non-Communicable Diseases in Developing Countries (PUBH 7200 - 115)
+

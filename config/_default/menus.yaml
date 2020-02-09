@@ -1,0 +1,16 @@
+main:
+  - name: Research
+    url: /research/
+    weight: 1
+  - name: Teaching
+    url: /teaching/
+    weight: 2
+  - name: Publications
+    url: /publications/
+    weight: 3
+  - name: Talks
+    url: /talks/
+    weight: 4
+  - name: Projects
+    url: /project/
+    weight: 5

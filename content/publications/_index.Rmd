@@ -1,0 +1,10 @@
+---
+title: Publications
+type: docs
+weight: 1
+---
+
+
+## Publications
+
+Examples of completed work in these areas can be found on [PubMed](https://www.ncbi.nlm.nih.gov/pubmed?term=Capistrant%2C%20Benjamin%5BAuthor%5D) or [Google Scholar](https://scholar.google.com/citations?hl=en&pli=1&user=987QJWYAAAAJ).

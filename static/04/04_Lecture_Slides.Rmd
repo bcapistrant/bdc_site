@@ -1,0 +1,384 @@
+---
+title: "Model Inference and Partitioning Error"
+author: "Benjamin D. Capistrant, Smith College"
+date: "Feb. 5, 2020"
+output:
+  sds::moon_reader:
+    lib_dir: libs
+    css: xaringan-themer.css
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r xaringan-themer, include=FALSE}
+# sds::duo_smith()
+sds::mono_light_smith()
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(dplyr)
+library(ggplot2)
+library(latex2exp)
+library(Stat2Data)
+data("AccordPrice")
+fit <- lm(Price ~ Mileage, data = AccordPrice)
+AccordPrice <- AccordPrice %>%
+  mutate(predicted = predict(fit),
+         residuals = residuals(fit),
+         top_right = Mileage + residuals,
+         bottom_right = Mileage + residuals,
+         y_bar = mean(Price)
+    )
+
+```
+
+---
+class: inverse
+
+# In Person Help
+## *Stat TA Hours:* Wed, Thurs, Sunday 7-9pm Sabin-Reed 301
+## *Student Hours:* Monday 10:30-12:30
+
+# Slack - #HW2 channel
+
+# [What's coming up?](/schedule/)
+---
+# Residuals
+
+.pull-left[
+```{r, warning=FALSE,error=FALSE,message=FALSE}
+# Residual - Overall
+ggplot(AccordPrice, aes(x=Mileage, y=Price)) +  # Set up canvas with outcome variable on y-axis
+  theme_bw() +
+  geom_point() + # Plot the actual points
+  geom_point(aes(x=Mileage, y = predicted), color="blue", size=2) + 
+  #geom_point(aes(x = top_right, y = Price), shape = 1, color="white") + 
+  #geom_point(aes(x = bottom_right, y = predicted), shape = 1, color="white") +
+  geom_smooth(method="lm", se=FALSE, size=0.5) +  
+  geom_segment(aes(x=Mileage, y=Price, xend = Mileage, yend = predicted)) +
+  #coord_cartesian(xlim = c(0,20), ylim=c(15,35)) + 
+  annotate("text",x=4.5, y=27, hjust=1, vjust=0.5,
+            label=TeX("$y$"), size=8) +
+  annotate("text",x=4.5, y=20, hjust=1, vjust=1,
+            label=TeX("$\\hat{y}$"), color="blue", size=8)  
+
+```
+]
+
+.pull-right[
+```{r, warning=FALSE,error=FALSE,message=FALSE}
+# Residual - ZOOMED
+ggplot(AccordPrice, aes(x=Mileage, y=Price)) +  # Set up canvas with outcome variable on y-axis
+  theme_bw() +
+  geom_point() + # Plot the actual points
+  geom_point(aes(x=Mileage, y = predicted), color="blue", size=2) + 
+  geom_point(aes(x = top_right, y = Price), shape = 1, color="white") + 
+  geom_point(aes(x = bottom_right, y = predicted), shape = 1, color="white") +
+  geom_smooth(method="lm", se=FALSE, size=0.5) +  
+  geom_segment(aes(x=Mileage, y=Price, xend = Mileage, yend = predicted)) +
+  coord_cartesian(xlim = c(0,20), ylim=c(15,35)) + 
+  annotate("text",x=4.5, y=27, hjust=1, vjust=0.5,
+            label=TeX("$y$"), size=8) +
+  annotate("text",x=4.5, y=20, hjust=1, vjust=1,
+            label=TeX("$\\hat{y}$"), color="blue", size=8)   
+```
+
+]
+
+---
+# Sum of Squared Residuals
+
+```{r, warning=FALSE,error=FALSE,message=FALSE}
+# Squared Residuals
+ggplot(AccordPrice, aes(x=Mileage, y=Price)) +  # Set up canvas with outcome variable on y-axis
+  theme_bw() +
+  geom_point() + # Plot the actual points
+  geom_point(aes(x=Mileage, y = predicted), color="blue", size=2) + 
+  geom_point(aes(x = top_right, y = Price), shape = 1, color="white") + 
+  geom_point(aes(x = bottom_right, y = predicted), shape = 1, color="white") +
+  geom_smooth(method="lm", se=FALSE, size=0.5) +  
+  geom_segment(aes(x=Mileage, y=Price, xend = Mileage, yend = predicted)) +
+  coord_cartesian(xlim = c(0,20), ylim=c(15,35)) + 
+  annotate("text",x=4.5, y=27, hjust=1, vjust=0.5,
+            label=TeX("$y$"), size=8) +
+  annotate("text",x=4.5, y=20, hjust=1, vjust=1,
+            label=TeX("$\\hat{y}$"), color="blue", size=8) + 
+  geom_segment(aes(x=Mileage, y=Price, yend = Price, xend = top_right), color = "grey", linetype = "dashed") +   geom_segment(aes(x=bottom_right, y=predicted, yend = Price, xend = top_right), color = "grey", linetype = "dashed") + 
+   geom_segment(aes(x=Mileage, y=predicted, yend = predicted, xend = bottom_right), color = "lightgrey", linetype = "dashed") +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank())
+```
+
+---
+class: middle, inverse, center
+
+# Separating Model Variance
+
+## SSTotal = SSModel + SSError
+
+## $\sum(y-\bar{y})^2 = \sum(\hat{y}-\bar{y})^2 + \sum(y-\hat{y})^2$
+---
+# Sum of Squares Total
+
+```{r, error=FALSE, message=FALSE, warning=FALSE}
+ggplot(AccordPrice, aes(x=Mileage, y=Price)) +  # Set up canvas with outcome variable on y-axis
+  theme_bw() +
+  geom_point() + # Plot the actual points
+  #geom_point(aes(x=Mileage, y = y_bar), color="red", size=1) + 
+  #geom_point(aes(x=Mileage, y = predicted), color="blue", size=1) + 
+  geom_smooth(method="lm", se=FALSE, size=0.5) +  
+  #geom_hline(yintercept=14.27667, color="red") +
+  geom_segment(aes(x=3 ,xend=150,y=AccordPrice$y_bar,yend=AccordPrice$y_bar), color="red") +
+  geom_segment(aes(x=Mileage, y=Price, xend = Mileage, yend = AccordPrice$y_bar), color="black", linetype="dashed", size=0.5) +
+  annotate("text",x=-.3, y=27, hjust=1, vjust=0.5,
+            label=TeX("$y_i$"), size=8) +
+  annotate("text",x=-.3, y=20, hjust=1, vjust=0.25,
+            label=TeX("$\\hat{y}_i$"), color="blue", size=8) + 
+  annotate("text",x=-.3, y=14, hjust=1, vjust=0.5,
+            label=TeX("$\\bar{y}$"), color="red", size=8) + 
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank())
+```
+
+---
+# Partitioning SST into SSM & SSE
+
+```{r, warning=FALSE, message=FALSE, error=FALSE}
+
+ggplot(AccordPrice, aes(x=Mileage, y=Price)) +  # Set up canvas with outcome variable on y-axis
+  theme_bw() +
+  geom_point() + # Plot the actual points
+  #geom_point(aes(x=Mileage, y = y_bar), color="red", size=1) + 
+  #geom_point(aes(x=Mileage, y = predicted), color="blue", size=1) + 
+  geom_smooth(method="lm", se=FALSE, size=0.5) +  
+  #geom_hline(yintercept=14.27667, color="red") +
+  geom_segment(aes(x=3 ,xend=150,y=AccordPrice$y_bar,yend=AccordPrice$y_bar), color="red") +
+  geom_segment(aes(x=Mileage, y=Price, xend = Mileage, yend = predicted), color="blue", linetype="solid", size=0.5) +
+  geom_segment(aes(x=Mileage, y=predicted, xend = Mileage, yend = AccordPrice$y_bar), color="red", linetype="dashed", size=0.5) +
+  annotate("text",x=-.3, y=27, hjust=1, vjust=0.5,
+            label=TeX("$y_i$"), size=8) +
+  annotate("text",x=-.3, y=20, hjust=1, vjust=0.25,
+            label=TeX("$\\hat{y}_i$"), color="blue", size=8) + 
+  annotate("text",x=-.3, y=14, hjust=1, vjust=0.5,
+            label=TeX("$\\bar{y}$"), color="red", size=8) + 
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank())
+
+```
+
+---
+# If the relationship were weak
+
+```{r, warning=FALSE, message=FALSE, error=FALSE}
+library(MASS)
+weak <- as.data.frame(mvrnorm(1000, mu = c(0,0), Sigma = matrix(c(1,0.13,0.13,1), ncol = 2),
+               empirical = TRUE))
+fitweak <- lm(V1 ~ V2, data = weak)
+weak <- weak %>%
+  mutate(predicted = predict(fitweak),
+         residuals = residuals(fitweak),
+         y_bar = mean(V1)
+    ) %>%
+  rename(x=V2, y=V1)
+
+
+ggplot(weak, aes(x=x, y=y)) +  # Set up canvas with outcome variable on y-axis
+  theme_bw() +
+  geom_point() + # Plot the actual points
+  #geom_point(aes(x=Mileage, y = y_bar), color="red", size=1) + 
+  #geom_point(aes(x=Mileage, y = predicted), color="blue", size=1) + 
+  geom_smooth(method="lm", se=FALSE, size=0.5)
+
+
+```
+
+---
+# If the relationship were weak
+
+```{r, warning=FALSE, message=FALSE, error=FALSE}
+ggplot(weak, aes(x=x, y=y)) +  # Set up canvas with outcome variable on y-axis
+  theme_bw() +
+  geom_point() + # Plot the actual points
+  #geom_point(aes(x=Mileage, y = y_bar), color="red", size=1) + 
+  #geom_point(aes(x=Mileage, y = predicted), color="blue", size=1) + 
+  geom_smooth(method="lm", se=FALSE, size=0.5) +  
+  #geom_hline(yintercept=0, color="red") +
+  geom_segment(aes(x=-2 ,xend=2,y=weak$y_bar,yend=weak$y_bar), color="red") +
+  geom_segment(aes(x=x, y=y, xend = x, yend = predicted), color="blue", linetype="solid", size=0.5) +
+  geom_segment(aes(x=x, y=predicted, xend = x, yend = weak$y_bar), color="red", linetype="solid", size=0.5) +
+  annotate("text",x=-2.25, y=1.7, hjust=1, vjust=0.5,
+            label=TeX("$y_i$"), size=8) +
+  annotate("text",x=-2.25, y=-0.4, hjust=1, vjust=0.25,
+            label=TeX("$\\hat{y}_i$"), color="blue", size=8) + 
+  annotate("text",x=-2.25, y=0, hjust=1, vjust=0.5,
+            label=TeX("$\\bar{y}$"), color="red", size=8) + 
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank())
+
+```
+
+---
+# If the relationship were strong
+
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+
+strong <- as.data.frame(mvrnorm(1000, mu = c(0,0), Sigma = matrix(c(1,0.83,0.83,1), ncol = 2),
+               empirical = TRUE))
+fitstrong <- lm(V1 ~ V2, data = strong)
+strong <- strong %>%
+  mutate(predicted = predict(fitstrong),
+         residuals = residuals(fitstrong),
+         y_bar = mean(V1)
+    ) %>%
+  rename(x=V2, y=V1)
+
+
+ggplot(strong, aes(x=x, y=y)) +  # Set up canvas with outcome variable on y-axis
+  theme_bw() +
+  geom_point() + # Plot the actual points
+  #geom_point(aes(x=Mileage, y = y_bar), color="red", size=1) + 
+  #geom_point(aes(x=Mileage, y = predicted), color="blue", size=1) + 
+  geom_smooth(method="lm", se=FALSE, size=0.5)
+
+```
+
+---
+# If the relationship were strong
+
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+
+ggplot(strong, aes(x=x, y=y)) +  # Set up canvas with outcome variable on y-axis
+  theme_bw() +
+  geom_point() + # Plot the actual points
+  #geom_point(aes(x=Mileage, y = y_bar), color="red", size=1) + 
+  #geom_point(aes(x=Mileage, y = predicted), color="blue", size=1) + 
+  geom_smooth(method="lm", se=FALSE, size=0.5) +  
+  #geom_hline(yintercept=0, color="red") +
+  geom_segment(aes(x=-2 ,xend=2,y=strong$y_bar,yend=strong$y_bar), color="red") +
+  geom_segment(aes(x=x, y=y, xend = x, yend = predicted), color="blue", linetype="solid", size=0.5) +
+  geom_segment(aes(x=x, y=predicted, xend = x, yend = strong$y_bar), color="red", linetype="solid", size=0.5) +
+  annotate("text",x=-2.25, y=1.7, hjust=1, vjust=0.5,
+            label=TeX("$y_i$"), size=8) +
+  annotate("text",x=-2.25, y=-0.4, hjust=1, vjust=0.25,
+            label=TeX("$\\hat{y}_i$"), color="blue", size=8) + 
+  annotate("text",x=-2.25, y=0, hjust=1, vjust=0.5,
+            label=TeX("$\\bar{y}$"), color="red", size=8) + 
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank())
+
+```
+
+
+---
+class: middle, inverse, center
+
+# A "significant" Model will have:
+
+# Big SSM, Small SSE
+
+---
+class: middle, inverse, center
+
+# ANOVA Table
+
+```{r}
+data("AccordPrice")
+m1<-lm(Price~Mileage, data=AccordPrice)
+```
+
+---
+#
+Rows and Columns of the ANOVA Table
+In R, each slope coefficient has its own row in the Table. The residuals have their own row.
+
+### Degrees of Freedom
+
+### Sum of Square
+
+### Mean Squares ( $\frac{Sum Squares}{df}$ )
+
+### F value (test statistic: $F= \frac{MSModel}{MSError}$)
+  - $H_0: \beta_1=0$ and $H_A: \beta_1 \ne 0$
+
+### p-value for the F test
+
+### [Shiny App - practice your F test intuition](https://gallery.shinyapps.io/dist_calc/)
+
+---
+### Recreate for Accord Price
+
+The df and Sum Sq are:
+
+_ | DF | Sum Sq | Mean Sq | F value | Pr(>F)
+------ | --- | --- |  --- | --- | 
+Mileage | 1 | 687.66 | | |
+Residuals | 28 | 266.49 | | |
+
+---
+# R-Squared
+
+$$ R^2 = \frac{SSModel}{SSTotal} = \frac{\sum (\hat{y}-\bar{y})^2}{\sum (y-\bar{y})^2}$$
+
+Use the values from the ANOVA table below between Price and Milege to calculate $r^2$.
+```{r, echo=TRUE}
+anova(m1)
+```
+
+> $R^2$, or the percent of variation in the response variable explained by the model, is ...
+
+> XX% of the variation in used Honda Accord Prices can be explained by the car's mileage.
+
+---
+### Residual/Regression Standard Error
+
+$$\hat{\sigma_{\epsilon}} = \sqrt{\frac{\sum(y - \bar{y}) ^2}{n-2}} = \sqrt{\frac{SSE}{n-2}}$$
+
+Use the values from the ANOVA table below between Price and Milege to calculate $r^2$.
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+anova(m1)
+```
+
+> The regression standard error, or the average amount of error in the regression model, is ...
+
+> The regression model predicting used Honda Accords' prices as a function of the car's mileage is off by, on average, $XXX.
+
+---
+### These values aren't saved in R, but you can re-create them.
+```{r, echo=TRUE}
+#SSTotal = SSModel + SSE
+SSTotal <- var( AccordPrice$Price ) * (nrow(AccordPrice)-1)
+SSE<- sum(m1$resid^2 )
+SSModel<- SSTotal - SSE
+c(SSTotal, SSE, SSModel)
+```
+
+```{r, echo=TRUE}
+# R2
+our_r2<-SSModel/SSTotal
+our_r2
+```
+
+```{r, echo=TRUE}
+# RSE
+n2_df<-nrow(AccordPrice)-2
+our_rse<-sqrt(SSE/n2_df)
+our_rse
+```
+
+---
+# Cautions about $R^2$
+
+- What is a "big" $R^2$?
+
+- You likely don't care unless predicting
+    - Remember why we model: prediction, assessing relationships, testing differences
+        - Investment in education and GDP growth
+        - Wage differences by age
